@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29905.134
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Syspeace", "Syspeace\Syspeace.csproj", "{4BC62B72-57D7-45B2-ADD9-9A6FD279BFBA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4BC62B72-57D7-45B2-ADD9-9A6FD279BFBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BC62B72-57D7-45B2-ADD9-9A6FD279BFBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BC62B72-57D7-45B2-ADD9-9A6FD279BFBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BC62B72-57D7-45B2-ADD9-9A6FD279BFBA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC15444C-F377-4715-B464-8D45FFB828E6}
+	EndGlobalSection
+EndGlobal
