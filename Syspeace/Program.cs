@@ -11,9 +11,7 @@ namespace Syspeace
         const string LoginFile = @"C:\Users\jonat\source\repos\Syspeace\Syspeace\Data\LoginFile.txt";
         static string[] TextList = File.ReadAllLines(LoginFile);
 
-        static List<string> SortedLogsByID = new List<string>();
-        static List<string> ObservationSort = new List<string>();
-        static List<string> FullObservation = new List<string>();
+        static List<Observation> FullObservation = new List<Observation>();
         static void Main(string[] args)
         {
             for (int i = 0; i < TextList.Length; i++)
@@ -24,14 +22,11 @@ namespace Syspeace
                 {
                     ConnectSearch(LogRow);
                 }
-
-                //  Console.WriteLine(LogRow);
             }
 
-            ObservationSort = SortedLogsByID;
-            foreach (var item in ObservationSort)
+            foreach (var item in FullObservation)
             {
-                Console.WriteLine(item);
+                Console.WriteLine(item.SectionID + "  " + item.Outcome);
             }
         }
         static void ConnectSearch(string Logrow)
@@ -42,11 +37,24 @@ namespace Syspeace
         }
         static void SearchLogByID(string ID)
         {
+            Observation _observation = new Observation();
             foreach (var item in TextList)
             {
-                if (item.Contains(ID))
+                if (item.Contains(ID) && item.Contains("\tCONNECT"))
                 {
-                    SortedLogsByID.Add(item);
+                    _observation.TimeStamp = DateTime.Parse(item.Substring(0, 8));
+                    _observation.SectionID = int.Parse(ID);
+                    _observation.IPAddress = item.Substring(21);
+                }
+                else if (item.Contains(ID) && item.Contains("\tAUTH"))
+                {
+                    _observation.Username = item.Substring(18);
+                }
+                else if (item.Contains(ID) && (item.Contains("\tSUCCESS") || item.Contains("\tFAIL")))
+                {
+                    int StopLenght = item.IndexOf("\t-");
+                    _observation.Outcome = item.Substring(13, (StopLenght - 13));
+                    FullObservation.Add(_observation);
                 }
             }
         }
@@ -54,3 +62,5 @@ namespace Syspeace
 }
 
 // Tid - ID - Status - Användarnamn - IP Adress
+//Bugg - får 13 observationen men får för många success och för få fail
+//namngivningar
