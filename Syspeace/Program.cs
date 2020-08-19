@@ -26,7 +26,7 @@ namespace Syspeace
 
             foreach (var item in FullObservation)
             {
-                Console.WriteLine(item.SectionID + "  " + item.Outcome);
+                Console.WriteLine(item.TimeStamp + " " + item.SectionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
             }
         }
         static void ConnectSearch(string Logrow)
@@ -38,23 +38,38 @@ namespace Syspeace
         static void SearchLogByID(string ID)
         {
             Observation _observation = new Observation();
+            string IPAddress = "";
+            int Count = 0;
             foreach (var item in TextList)
             {
                 if (item.Contains(ID) && item.Contains("\tCONNECT"))
                 {
-                    _observation.TimeStamp = DateTime.Parse(item.Substring(0, 8));
                     _observation.SectionID = int.Parse(ID);
-                    _observation.IPAddress = item.Substring(21);
+                    IPAddress = item.Substring(21);
+                    _observation.IPAddress = IPAddress;
                 }
                 else if (item.Contains(ID) && item.Contains("\tAUTH"))
                 {
+                    if (Count > 0)
+                    {
+                        _observation = new Observation();
+                    }
                     _observation.Username = item.Substring(18);
                 }
                 else if (item.Contains(ID) && (item.Contains("\tSUCCESS") || item.Contains("\tFAIL")))
                 {
                     int StopLenght = item.IndexOf("\t-");
+                    _observation.TimeStamp = DateTime.Parse(item.Substring(0, 8));
                     _observation.Outcome = item.Substring(13, (StopLenght - 13));
+
+                    if (Count > 0)
+                    {
+                        _observation.SectionID = int.Parse(ID);
+                        _observation.IPAddress = IPAddress;
+                    }
+
                     FullObservation.Add(_observation);
+                    Count++;
                 }
             }
         }
