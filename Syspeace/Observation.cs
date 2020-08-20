@@ -6,7 +6,7 @@ namespace Syspeace
 {
     class Observation
     {
-        public int SectionID { get; set; }
+        public int SessionID { get; set; }
         public string IPAddress { get; set; }
         public DateTime TimeStamp { get; set; }
         public string Outcome { get; set; }

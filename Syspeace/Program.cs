@@ -14,7 +14,7 @@ namespace Syspeace
 
             foreach (var item in ObservationList)
             {
-                Console.WriteLine(item.TimeStamp + " " + item.SectionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
+                Console.WriteLine(item.TimeStamp + " " + item.SessionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
             }
         }
         static List<Observation> ReadTextFile(string FilePath)
@@ -35,3 +35,5 @@ namespace Syspeace
 }
 
 // Tid - ID - Status - Användarnamn - IP Adress
+//prova ändra session id/saker i text filen på första connecten för att se om regex matchningen funkar
+//Regex matchning på Event (Coonnect, Auth, Fail, Success) vid ifsatsen
