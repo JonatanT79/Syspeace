@@ -8,9 +8,8 @@ namespace Syspeace
 {
     static class ObservationObject
     {
-        const string LoginFile = @"C:\Users\jonat\source\repos\Syspeace\Syspeace\Data\LoginFile.txt";
-        public static string[] TextList = File.ReadAllLines(LoginFile);
-
+        public const string TextFile = @"C:\Users\jonat\source\repos\Syspeace\Syspeace\Data\LoginFile.txt";
+        public static string[] TextList = File.ReadAllLines(TextFile);
         public static List<Observation> ObservationList = new List<Observation>();
 
         public static void SearchForIDInLogRow(string Logrow)

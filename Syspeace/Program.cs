@@ -8,8 +8,16 @@ namespace Syspeace
 {
     class Program
     {
-      
         static void Main(string[] args)
+        {
+            var ObservationList = ReadTextFile(ObservationObject.TextFile);
+
+            foreach (var item in ObservationList)
+            {
+                Console.WriteLine(item.TimeStamp + " " + item.SectionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
+            }
+        }
+        static List<Observation> ReadTextFile(string FilePath)
         {
             for (int i = 0; i < ObservationObject.TextList.Length; i++)
             {
@@ -21,10 +29,7 @@ namespace Syspeace
                 }
             }
 
-            foreach (var item in ObservationObject.ObservationList)
-            {
-                Console.WriteLine(item.TimeStamp + " " + item.SectionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
-            }
+            return ObservationObject.ObservationList;
         }
     }
 }
