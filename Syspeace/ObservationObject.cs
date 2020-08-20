@@ -40,7 +40,6 @@ namespace Syspeace
                 {
                     _observation.SessionID = int.Parse(ID);
                     IPAddress = GetIndexOfRegexMatch(item, "CONNECT");
-                    // IPAddress = item.Substring(21);
                     _observation.IPAddress = IPAddress;
                 }
                 else if (item.Contains(ID) && item.Contains("\tAUTH"))
@@ -49,6 +48,7 @@ namespace Syspeace
                     {
                         _observation = new Observation();
                     }
+                    GetIndexOfRegexMatch(item, "AUTH");
                     _observation.Username = item.Substring(18);
                 }
                 else if (item.Contains(ID) && (item.Contains("\tSUCCESS") || item.Contains("\tFAIL")))
@@ -83,13 +83,13 @@ namespace Syspeace
             else if (Outcome == "AUTH")
             {
                 Regex _regex = new Regex(".*");
-                Match match = _regex.Match(LogLine);
+                Match match = _regex.Match(LogLine, StartAt + 2, Lenght);
                 return match.Value;
             }
             else if (Outcome == "SUCCESS" || Outcome == "FAIL")
             {
                 Regex _regex = new Regex(".*");
-                Match match = _regex.Match(LogLine);
+                Match match = _regex.Match(LogLine, StartAt + 2, Lenght);
                 return match.Value;
             }
 
