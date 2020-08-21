@@ -19,13 +19,20 @@ namespace Syspeace
         }
         static List<Observation> ReadTextFile(string FilePath)
         {
+            string SessionID = "";
+
             for (int i = 0; i < ObservationObject.TextList.Length; i++)
             {
                 string LogRow = ObservationObject.TextList[i];
+                var ColumnArray = LogRow.Split("\t");
 
                 if (LogRow.Contains("\tCONNECT"))
                 {
-                    ObservationObject.SearchForIDInLogRow(LogRow);
+                    if (ColumnArray[1] != SessionID)
+                    {
+                        ObservationObject.SearchForIDInLogRow(LogRow);
+                    }
+                    SessionID = ColumnArray[1];
                 }
             }
 
@@ -35,5 +42,6 @@ namespace Syspeace
 }
 
 // Tid - ID - Status - Användarnamn - IP Adress
-//prova ändra session id/saker i text filen på första connecten för att se om regex matchningen funkar
-//Regex matchning på Event (Coonnect, Auth, Fail, Success) vid ifsatsen
+//Vid en andra connect med samma sessionID: rensa (ip) och ersätt med den nya (2:a connect)
+//Punkt 2.1 fungerar halvt
+//Punkt 2.2 (timespamp) behövs fixas

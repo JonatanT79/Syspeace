@@ -14,7 +14,7 @@ namespace Syspeace
 
         public static void SearchForIDInLogRow(string Logrow)
         {
-            string ID = GetIndexOfRegexMatch(Logrow, "SessionID");
+            string ID = GetValueFromRegexMatch(Logrow, "SessionID");
             MakeLogsToObservationObject(ID);
         }
         public static void MakeLogsToObservationObject(string ID)
@@ -27,7 +27,7 @@ namespace Syspeace
                 if (item.Contains(ID) && item.Contains("\tCONNECT"))
                 {
                     _observation.SessionID = int.Parse(ID);
-                    IPAddress = GetIndexOfRegexMatch(item, "CONNECT");
+                    IPAddress = GetValueFromRegexMatch(item, "CONNECT");
                     _observation.IPAddress = IPAddress;
                 }
                 else if (item.Contains(ID) && item.Contains("\tAUTH"))
@@ -36,7 +36,7 @@ namespace Syspeace
                     {
                         _observation = new Observation();
                     }
-                    _observation.Username = GetIndexOfRegexMatch(item, "AUTH");
+                    _observation.Username = GetValueFromRegexMatch(item, "AUTH");
                 }
                 else if (item.Contains(ID) && (item.Contains("\tSUCCESS") || item.Contains("\tFAIL")))
                 {
@@ -44,11 +44,11 @@ namespace Syspeace
 
                     if (item.Contains("\tSUCCESS"))
                     {
-                        _observation.Outcome = GetIndexOfRegexMatch(item, "SUCCESS");
+                        _observation.Outcome = GetValueFromRegexMatch(item, "SUCCESS");
                     }
                     else
                     {
-                        _observation.Outcome = GetIndexOfRegexMatch(item, "FAIL");
+                        _observation.Outcome = GetValueFromRegexMatch(item, "FAIL");
                     }
 
                     if (Count > 0)
@@ -62,7 +62,7 @@ namespace Syspeace
                 }
             }
         }
-        public static string GetIndexOfRegexMatch(string LogLine, string Outcome)
+        public static string GetValueFromRegexMatch(string LogLine, string Outcome)
         {
             int Index = LogLine.IndexOf("\t" + Outcome);
             int StartAt = Index + Outcome.Length;
