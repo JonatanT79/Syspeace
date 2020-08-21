@@ -14,19 +14,7 @@ namespace Syspeace
 
         public static void SearchForIDInLogRow(string Logrow)
         {
-            //Alternativ2
-            //var Column4ArrayTest = Logrow.Split("\t");
-            //string SessionID = Column4ArrayTest[1];
-            //Match match1 = Regex.Match(SessionID, @"\b\d+\b");
-            ////Checkar om regex matching fungerar
-            //Console.WriteLine(match1 + " match1");
-            //Console.ReadLine();
-
-            //ALternativ1
-            Regex _regex = new Regex(@"\d+");
-            Match match = _regex.Match(Logrow, 9, Logrow.Length);
-            string ID = match.Value;
-            Console.WriteLine(ID + " match");
+            string ID = GetIndexOfRegexMatch(Logrow, "SessionID");
             MakeLogsToObservationObject(ID);
         }
         public static void MakeLogsToObservationObject(string ID)
@@ -48,14 +36,20 @@ namespace Syspeace
                     {
                         _observation = new Observation();
                     }
-                    GetIndexOfRegexMatch(item, "AUTH");
-                    _observation.Username = item.Substring(18);
+                    _observation.Username = GetIndexOfRegexMatch(item, "AUTH");
                 }
                 else if (item.Contains(ID) && (item.Contains("\tSUCCESS") || item.Contains("\tFAIL")))
                 {
-                    int StopLenght = item.IndexOf("\t-");
                     _observation.TimeStamp = DateTime.Parse(item.Substring(0, 8));
-                    _observation.Outcome = item.Substring(13, (StopLenght - 13));
+
+                    if (item.Contains("\tSUCCESS"))
+                    {
+                        _observation.Outcome = GetIndexOfRegexMatch(item, "SUCCESS");
+                    }
+                    else
+                    {
+                        _observation.Outcome = GetIndexOfRegexMatch(item, "FAIL");
+                    }
 
                     if (Count > 0)
                     {
@@ -74,7 +68,13 @@ namespace Syspeace
             int StartAt = Index + Outcome.Length;
             int Lenght = LogLine.Length - (StartAt + 2);
 
-            if (Outcome == "CONNECT")
+            if (Outcome == "SessionID")
+            {
+                Regex _regex = new Regex(@"\d+");
+                Match match = _regex.Match(LogLine, 9, LogLine.Length);
+                return match.Value;
+            }
+            else if (Outcome == "CONNECT")
             {
                 Regex _regex = new Regex(@".*");
                 Match match = _regex.Match(LogLine, StartAt + 2, Lenght);
@@ -88,8 +88,9 @@ namespace Syspeace
             }
             else if (Outcome == "SUCCESS" || Outcome == "FAIL")
             {
+                Lenght = LogLine.Length - (Index + 3);
                 Regex _regex = new Regex(".*");
-                Match match = _regex.Match(LogLine, StartAt + 2, Lenght);
+                Match match = _regex.Match(LogLine, Index + 1, Lenght);
                 return match.Value;
             }
 
