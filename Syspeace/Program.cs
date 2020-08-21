@@ -16,6 +16,9 @@ namespace Syspeace
             {
                 Console.WriteLine(item.TimeStamp + " " + item.SessionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
             }
+
+            Console.WriteLine("");
+            Console.WriteLine("Observation Count: " + ObservationList.Count);
         }
         static List<Observation> ReadTextFile(string FilePath)
         {
@@ -31,8 +34,8 @@ namespace Syspeace
                     if (ColumnArray[1] != SessionID)
                     {
                         ObservationObject.SearchForIDInLogRow(LogRow);
+                        SessionID = ColumnArray[1];
                     }
-                    SessionID = ColumnArray[1];
                 }
             }
 
