@@ -45,6 +45,7 @@ namespace Syspeace
 }
 
 // Tid - ID - Status - Användarnamn - IP Adress
+//Felhantering för om det t.ex inte finns något ID
 //Vid en andra connect med samma sessionID: rensa (ip) och ersätt med den nya (2:a connect)
 //Punkt 2.1 fungerar halvt
 //Punkt 2.2 (timespamp) behövs fixas
