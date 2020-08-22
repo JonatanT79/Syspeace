@@ -10,11 +10,11 @@ namespace Syspeace
     {
         static void Main(string[] args)
         {
-            var ObservationList = ReadTextFile(ObservationObject.TextFile);
+            var ObservationList = ReadTextFile(ObservationObject.FilePath);
 
             foreach (var item in ObservationList)
             {
-                Console.WriteLine(item.TimeStamp + " " + item.SessionID + "  " + item.Outcome + " " + item.Username + " " + item.IPAddress);
+                Console.WriteLine(item.TimeStamp + " " + item.SessionID + " " + item.Outcome + " " + item.Username + " " + item.IPAddress);
             }
 
             Console.WriteLine("");
@@ -24,9 +24,9 @@ namespace Syspeace
         {
             string SessionID = "";
 
-            for (int i = 0; i < ObservationObject.TextList.Length; i++)
+            for (int i = 0; i < ObservationObject.TextFile.Length; i++)
             {
-                string LogRow = ObservationObject.TextList[i];
+                string LogRow = ObservationObject.TextFile[i];
                 var ColumnArray = LogRow.Split("\t");
 
                 if (LogRow.Contains("\tCONNECT"))
@@ -44,8 +44,10 @@ namespace Syspeace
     }
 }
 
+//Format:
 // Tid - ID - Status - Användarnamn - IP Adress
-//Felhantering för om det t.ex inte finns något ID
+
+//Punkt 2.1 fungerar halvt (alla outcome får det sista fail/success)
+//men användarnamnet blir rätt (alla får det senaste användarnamnet)
 //Vid en andra connect med samma sessionID: rensa (ip) och ersätt med den nya (2:a connect)
-//Punkt 2.1 fungerar halvt
-//Punkt 2.2 (timespamp) behövs fixas
+//försök ta bort datetime decklaration, timecounter och isnullorwhitespace där nere (om möjligt) - Snygga till kod 
