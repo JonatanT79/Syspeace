@@ -15,32 +15,45 @@ namespace Syspeace
         public static void SearchForIDInLogRow(string Logrow)
         {
             string ID = GetValueFromRegexMatch(Logrow, "SessionID");
-            if (int.TryParse(ID, out int SessionID))
-            {
-                MakeLogsToObservationObject(ID);
-            }
+            MakeLogsToObservationObject(ID);
         }
         public static void MakeLogsToObservationObject(string ID)
         {
             Observation _observation = new Observation();
             string IPAddress = "";
-            DateTime PreviousLineTime = DateTime.Now;
-            DateTime NextLineTime = DateTime.Now.AddMinutes(60);
+            string GetTime = "";
+            DateTime PreviousLineTime = new DateTime();
+            DateTime NextLineTime = new DateTime();
             int Count = 0;
-            int TimeCounter = 0;
+            bool CorrectPreviousTime = false;
 
             foreach (var item in TextFile)
             {
-                if (!string.IsNullOrWhiteSpace(item) && TimeCounter == 0)
+                bool SuccessfulTimeParse = false;
+
+                if (CorrectPreviousTime == false)
                 {
-                    PreviousLineTime = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
+                    GetTime = GetValueFromRegexMatch(item, "Time");
+
+                    if (DateTime.TryParse(GetTime, out DateTime PreviousTime))
+                    {
+                        PreviousLineTime = PreviousTime;
+                        SuccessfulTimeParse = true;
+                        NextLineTime = PreviousLineTime.AddHours(24);
+                    }
                 }
-                else if (!string.IsNullOrWhiteSpace(item) && TimeCounter > 0)
+                else if (!string.IsNullOrWhiteSpace(item) && CorrectPreviousTime == true)
                 {
-                    NextLineTime = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
+                    GetTime = GetValueFromRegexMatch(item, "Time");
+
+                    if (DateTime.TryParse(GetTime, out DateTime NextTime))
+                    {
+                        NextLineTime = NextTime;
+                        SuccessfulTimeParse = true;
+                    }
                 }
 
-                if (PreviousLineTime < NextLineTime || TimeCounter == 0)
+                if (PreviousLineTime <= NextLineTime && SuccessfulTimeParse == true)
                 {
                     if (item.Contains("\t" + ID) && item.Contains("\tCONNECT"))
                     {
@@ -78,15 +91,15 @@ namespace Syspeace
                         ObservationList.Add(_observation);
                         Count++;
                     }
+                }
 
-                    if (!string.IsNullOrWhiteSpace(item) && TimeCounter != 0)
-                    {
-                        PreviousLineTime = NextLineTime;
-                    }
-                    else if(!string.IsNullOrWhiteSpace(item) && TimeCounter == 0)
-                    {
-                        TimeCounter++;
-                    }
+                if (!string.IsNullOrWhiteSpace(item) && CorrectPreviousTime == true && SuccessfulTimeParse == true)
+                {
+                    PreviousLineTime = NextLineTime;
+                }
+                else if (DateTime.TryParse(GetTime, out DateTime Time))
+                {
+                    CorrectPreviousTime = true;
                 }
             }
         }
@@ -106,7 +119,7 @@ namespace Syspeace
             }
             else if (Outcome == "Time")
             {
-                Regex _regex = new Regex(@"..:..:..");
+                Regex _regex = new Regex(@"..:..:..\t");
                 Match match = _regex.Match(LogLine);
                 return match.Value;
             }

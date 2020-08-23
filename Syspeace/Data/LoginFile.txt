@@ -1,7 +1,9 @@
-﻿
-# Written at 2020-08-17 13:32:30
-13:32:33	123	CONNECT	1.2.3.4
-13:32:34	123	AUTH	admin111
-13:30:35	123	SUCCESS	-
-13:33:35	123	SUCCESS	-
-
+﻿# Written at 2020-08-17 13:32:00
+# This log is written as a comment and should be ignored
+13:32:03	239	CONNECT	1.2.3.4
+13:XX:03	239	CONNECT	1.2.3.4
+13:XX:03	åäö	CONNECT	1.2.3.4
+13:32:04	239	AUTH	admin
+13:XX:04	239	AUTH	admin
+13:20:01	239	FAIL	-
+13:32:05	239	FAIL	-

@@ -29,7 +29,7 @@ namespace Syspeace
                 string LogRow = ObservationObject.TextFile[i];
                 var ColumnArray = LogRow.Split("\t");
 
-                if (LogRow.Contains("\tCONNECT"))
+                if (LogRow.Contains("\tCONNECT") && int.TryParse(ColumnArray[1], out int ID))
                 {
                     if (ColumnArray[1] != SessionID)
                     {
@@ -50,4 +50,4 @@ namespace Syspeace
 //Punkt 2.1 fungerar halvt (alla outcome får det sista fail/success)
 //men användarnamnet blir rätt (alla får det senaste användarnamnet)
 //Vid en andra connect med samma sessionID: rensa (ip) och ersätt med den nya (2:a connect)
-//försök ta bort datetime decklaration, timecounter och isnullorwhitespace där nere (om möjligt) - Snygga till kod 
+// Snygga till kod 
