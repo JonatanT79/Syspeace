@@ -46,8 +46,5 @@ namespace Syspeace
 
 //Format:
 // Tid - ID - Status - Användarnamn - IP Adress
-
-//Punkt 2.1 fungerar halvt (alla outcome får det sista fail/success)
-//men användarnamnet blir rätt (alla får det senaste användarnamnet)
-//Vid en andra connect med samma sessionID: rensa (ip) och ersätt med den nya (2:a connect)
-// Snygga till kod 
+// Snygga till kod + fixa resten av loggfilarna
+// - Lägga till konstanter och t.ex lägga '1' i index(program) i en variabel som t.ex heter sesionID

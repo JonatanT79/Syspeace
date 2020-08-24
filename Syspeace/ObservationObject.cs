@@ -55,13 +55,13 @@ namespace Syspeace
 
                 if (PreviousLineTime <= NextLineTime && SuccessfulTimeParse == true)
                 {
-                    if (item.Contains("\t" + ID) && item.Contains("\tCONNECT"))
+                    if (item.Contains("\t" + ID) && item.Contains("\tCONNECT\t"))
                     {
                         _observation.SessionID = int.Parse(ID);
                         IPAddress = GetValueFromRegexMatch(item, "CONNECT");
                         _observation.IPAddress = IPAddress;
                     }
-                    else if (item.Contains("\t" + ID) && item.Contains("\tAUTH"))
+                    else if (item.Contains("\t" + ID) && item.Contains("\tAUTH\t"))
                     {
                         if (Count > 0)
                         {
@@ -69,11 +69,11 @@ namespace Syspeace
                         }
                         _observation.Username = GetValueFromRegexMatch(item, "AUTH");
                     }
-                    else if (item.Contains("\t" + ID) && (item.Contains("\tSUCCESS") || item.Contains("\tFAIL")))
+                    else if (item.Contains("\t" + ID) && (item.Contains("\tSUCCESS\t") || item.Contains("\tFAIL\t")))
                     {
                         _observation.TimeStamp = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
 
-                        if (item.Contains("\tSUCCESS"))
+                        if (item.Contains("\tSUCCESS\t"))
                         {
                             _observation.Outcome = GetValueFromRegexMatch(item, "SUCCESS");
                         }
@@ -88,7 +88,13 @@ namespace Syspeace
                             _observation.IPAddress = IPAddress;
                         }
 
-                        ObservationList.Add(_observation);
+                        bool ObservationHasAllValues = SearchNullValuesInObservation(_observation);
+
+                        if (ObservationHasAllValues == true)
+                        {
+                            ObservationList.Add(_observation);
+                        }
+
                         Count++;
                     }
                 }
@@ -144,6 +150,24 @@ namespace Syspeace
             }
 
             return "";
+        }
+        public static bool SearchNullValuesInObservation(Observation observation)
+        {
+            if
+            (
+                observation.SessionID == 0 ||
+                observation.IPAddress == null ||
+                observation.Username == null ||
+                observation.TimeStamp == null ||
+                observation.Outcome == null
+            )
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }
