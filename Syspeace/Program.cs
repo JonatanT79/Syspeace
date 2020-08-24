@@ -29,7 +29,8 @@ namespace Syspeace
                 string LogRow = ObservationObject.TextFile[i];
                 var ColumnArray = LogRow.Split("\t");
 
-                if (LogRow.Contains("\tCONNECT") && int.TryParse(ColumnArray[1], out int ID))
+                //Fixa ifsatsen
+                if (LogRow.Contains("\tCONNECT\t") && int.TryParse(ColumnArray[1], out int ID) && ID >= 1)
                 {
                     if (ColumnArray[1] != SessionID)
                     {
@@ -46,5 +47,6 @@ namespace Syspeace
 
 //Format:
 // Tid - ID - Status - Användarnamn - IP Adress
+//en metod för att kolla om alla prop går att parsa (i observationobject)
 // Snygga till kod + fixa resten av loggfilarna
 // - Lägga till konstanter och t.ex lägga '1' i index(program) i en variabel som t.ex heter sesionID

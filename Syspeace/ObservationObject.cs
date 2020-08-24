@@ -153,8 +153,7 @@ namespace Syspeace
         }
         public static bool SearchNullValuesInObservation(Observation observation)
         {
-            if
-            (
+            if (
                 observation.SessionID == 0 ||
                 observation.IPAddress == null ||
                 observation.Username == null ||
