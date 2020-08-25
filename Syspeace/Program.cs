@@ -28,9 +28,14 @@ namespace Syspeace
             {
                 string LogRow = ObservationObject.TextFile[i];
                 var ColumnArray = LogRow.Split("\t");
+                bool ValidRow = false;
 
-                //Fixa ifsatsen
-                if (LogRow.Contains("\tCONNECT\t") && int.TryParse(ColumnArray[1], out int ID) && ID >= 1)
+                if(ColumnArray.Length == 4)
+                {
+                    ValidRow = ObservationObject.ValidInputCheck(ColumnArray);
+                }
+
+                if (LogRow.Contains("\tCONNECT\t") && ValidRow)
                 {
                     if (ColumnArray[1] != SessionID)
                     {

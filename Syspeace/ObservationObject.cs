@@ -27,9 +27,12 @@ namespace Syspeace
             int Count = 0;
             bool CorrectPreviousTime = false;
 
+            //Valid Check
             foreach (var item in TextFile)
             {
                 bool SuccessfulTimeParse = false;
+                var Columns = item.Split("\t");
+
 
                 if (CorrectPreviousTime == false)
                 {
@@ -55,13 +58,13 @@ namespace Syspeace
 
                 if (PreviousLineTime <= NextLineTime && SuccessfulTimeParse == true)
                 {
-                    if (item.Contains("\t" + ID) && item.Contains("\tCONNECT\t"))
+                    if (item.Contains("\t" + ID + "\t") && item.Contains("\tCONNECT\t"))
                     {
                         _observation.SessionID = int.Parse(ID);
                         IPAddress = GetValueFromRegexMatch(item, "CONNECT");
                         _observation.IPAddress = IPAddress;
                     }
-                    else if (item.Contains("\t" + ID) && item.Contains("\tAUTH\t"))
+                    else if (item.Contains("\t" + ID + "\t") && item.Contains("\tAUTH\t"))
                     {
                         if (Count > 0)
                         {
@@ -69,7 +72,7 @@ namespace Syspeace
                         }
                         _observation.Username = GetValueFromRegexMatch(item, "AUTH");
                     }
-                    else if (item.Contains("\t" + ID) && (item.Contains("\tSUCCESS\t") || item.Contains("\tFAIL\t")))
+                    else if (item.Contains("\t" + ID + "\t") && (item.Contains("\tSUCCESS\t") || item.Contains("\tFAIL\t")))
                     {
                         _observation.TimeStamp = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
 
@@ -166,6 +169,21 @@ namespace Syspeace
             else
             {
                 return true;
+            }
+        }
+        public static bool ValidInputCheck(string[] input)
+        {
+            if (
+                DateTime.TryParse(input[0], out DateTime datetime) &&
+                int.TryParse(input[1], out int ID) &&
+                ID >= 1
+            )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
     }
