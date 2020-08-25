@@ -52,6 +52,8 @@ namespace Syspeace
 
 //Format:
 // Tid - ID - Status - Användarnamn - IP Adress
-//en metod för att kolla om alla prop går att parsa (i observationobject)
-// Snygga till kod + fixa resten av loggfilarna
+//lägg till using static constants för att slippa skriva 'Constants.Connect'
 // - Lägga till konstanter och t.ex lägga '1' i index(program) i en variabel som t.ex heter sesionID
+//försök att använda path parametern
+//Skriv kod för att få med datumet från 'written at date'
+//Fixa connect buggen när koden körs mot magnus fil

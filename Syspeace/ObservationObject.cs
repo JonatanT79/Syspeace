@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+//using Syspeace.Constants;
 
 namespace Syspeace
 {
@@ -21,94 +23,87 @@ namespace Syspeace
         {
             Observation _observation = new Observation();
             string IPAddress = "";
-            string GetTime = "";
             DateTime PreviousLineTime = new DateTime();
             DateTime NextLineTime = new DateTime();
-            int Count = 0;
+            int AuthCount = 0;
             bool CorrectPreviousTime = false;
 
-            //Valid Check
             foreach (var item in TextFile)
             {
-                bool SuccessfulTimeParse = false;
+                bool ValidRow = false;
                 var Columns = item.Split("\t");
 
-
-                if (CorrectPreviousTime == false)
+                if (Columns.Length == 4)
                 {
-                    GetTime = GetValueFromRegexMatch(item, "Time");
+                    ValidRow = ValidInputCheck(Columns);
+                }
 
-                    if (DateTime.TryParse(GetTime, out DateTime PreviousTime))
+                if (ValidRow)
+                {
+                    if (CorrectPreviousTime == false)
                     {
-                        PreviousLineTime = PreviousTime;
-                        SuccessfulTimeParse = true;
+                        PreviousLineTime = DateTime.Parse(Columns[0]);
                         NextLineTime = PreviousLineTime.AddHours(24);
                     }
-                }
-                else if (!string.IsNullOrWhiteSpace(item) && CorrectPreviousTime == true)
-                {
-                    GetTime = GetValueFromRegexMatch(item, "Time");
-
-                    if (DateTime.TryParse(GetTime, out DateTime NextTime))
+                    else if (CorrectPreviousTime == true)
                     {
-                        NextLineTime = NextTime;
-                        SuccessfulTimeParse = true;
+                        NextLineTime = DateTime.Parse(Columns[0]);
                     }
-                }
 
-                if (PreviousLineTime <= NextLineTime && SuccessfulTimeParse == true)
-                {
-                    if (item.Contains("\t" + ID + "\t") && item.Contains("\tCONNECT\t"))
+                    if (PreviousLineTime <= NextLineTime)
                     {
-                        _observation.SessionID = int.Parse(ID);
-                        IPAddress = GetValueFromRegexMatch(item, "CONNECT");
-                        _observation.IPAddress = IPAddress;
-                    }
-                    else if (item.Contains("\t" + ID + "\t") && item.Contains("\tAUTH\t"))
-                    {
-                        if (Count > 0)
-                        {
-                            _observation = new Observation();
-                        }
-                        _observation.Username = GetValueFromRegexMatch(item, "AUTH");
-                    }
-                    else if (item.Contains("\t" + ID + "\t") && (item.Contains("\tSUCCESS\t") || item.Contains("\tFAIL\t")))
-                    {
-                        _observation.TimeStamp = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
-
-                        if (item.Contains("\tSUCCESS\t"))
-                        {
-                            _observation.Outcome = GetValueFromRegexMatch(item, "SUCCESS");
-                        }
-                        else
-                        {
-                            _observation.Outcome = GetValueFromRegexMatch(item, "FAIL");
-                        }
-
-                        if (Count > 0)
+                        if (item.Contains("\t" + ID + "\t") && item.Contains("\tCONNECT\t"))
                         {
                             _observation.SessionID = int.Parse(ID);
+                            IPAddress = GetValueFromRegexMatch(item, "CONNECT");
                             _observation.IPAddress = IPAddress;
                         }
-
-                        bool ObservationHasAllValues = SearchNullValuesInObservation(_observation);
-
-                        if (ObservationHasAllValues == true)
+                        else if (item.Contains("\t" + ID + "\t") && item.Contains("\tAUTH\t"))
                         {
-                            ObservationList.Add(_observation);
+                            if (AuthCount > 0)
+                            {
+                                _observation = new Observation();
+                            }
+                            _observation.Username = GetValueFromRegexMatch(item, "AUTH");
                         }
+                        else if (item.Contains("\t" + ID + "\t") && (item.Contains("\tSUCCESS\t") || item.Contains("\tFAIL\t")))
+                        {
+                            _observation.TimeStamp = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
 
-                        Count++;
+                            if (item.Contains("\tSUCCESS\t"))
+                            {
+                                _observation.Outcome = GetValueFromRegexMatch(item, "SUCCESS");
+                            }
+                            else
+                            {
+                                _observation.Outcome = GetValueFromRegexMatch(item, "FAIL");
+                            }
+
+                            if (AuthCount > 0)
+                            {
+                                _observation.SessionID = int.Parse(ID);
+                                _observation.IPAddress = IPAddress;
+                            }
+
+                            bool ObservationHasAllValues = SearchNullValuesInObservation(_observation);
+
+                            if (ObservationHasAllValues == true)
+                            {
+                                ObservationList.Add(_observation);
+                            }
+
+                            AuthCount++;
+                        }
                     }
-                }
 
-                if (!string.IsNullOrWhiteSpace(item) && CorrectPreviousTime == true && SuccessfulTimeParse == true)
-                {
-                    PreviousLineTime = NextLineTime;
-                }
-                else if (DateTime.TryParse(GetTime, out DateTime Time))
-                {
-                    CorrectPreviousTime = true;
+                    if (CorrectPreviousTime == true)
+                    {
+                        PreviousLineTime = NextLineTime;
+                    }
+                    else if (CorrectPreviousTime == false)
+                    {
+                        CorrectPreviousTime = true;
+                    }
                 }
             }
         }
