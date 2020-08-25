@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using static Syspeace.Constants;
 
 namespace Syspeace
 {
@@ -12,9 +13,9 @@ namespace Syspeace
         {
             var ObservationList = ReadTextFile(ObservationObject.FilePath);
 
-            foreach (var item in ObservationList)
+            foreach (var observation in ObservationList)
             {
-                Console.WriteLine(item.TimeStamp + " " + item.SessionID + " " + item.Outcome + " " + item.Username + " " + item.IPAddress);
+                Console.WriteLine(observation.TimeSpan + " " + observation.SessionID + " " + observation.Outcome + " " + observation.Username + " " + observation.IPAddress);
             }
 
             Console.WriteLine("");
@@ -30,17 +31,17 @@ namespace Syspeace
                 var ColumnArray = LogRow.Split("\t");
                 bool ValidRow = false;
 
-                if(ColumnArray.Length == 4)
+                if (ColumnArray.Length == 4)
                 {
                     ValidRow = ObservationObject.ValidInputCheck(ColumnArray);
                 }
 
-                if (LogRow.Contains("\tCONNECT\t") && ValidRow)
+                if (LogRow.Contains(Connect) && ValidRow)
                 {
-                    if (ColumnArray[1] != SessionID)
+                    if (ColumnArray[SessionIDColumn] != SessionID)
                     {
                         ObservationObject.SearchForIDInLogRow(LogRow);
-                        SessionID = ColumnArray[1];
+                        SessionID = ColumnArray[SessionIDColumn];
                     }
                 }
             }
@@ -52,8 +53,7 @@ namespace Syspeace
 
 //Format:
 // Tid - ID - Status - Användarnamn - IP Adress
-//lägg till using static constants för att slippa skriva 'Constants.Connect'
-// - Lägga till konstanter och t.ex lägga '1' i index(program) i en variabel som t.ex heter sesionID
 //försök att använda path parametern
-//Skriv kod för att få med datumet från 'written at date'
+//Skriv kod för att få med datumet från 'written at date' och lägga in det i 'data' propertyn
+//Försök att ersätta 3 i regex.match -> lägga in det i en variabel
 //Fixa connect buggen när koden körs mot magnus fil

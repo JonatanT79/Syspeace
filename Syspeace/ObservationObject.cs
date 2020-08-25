@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-//using Syspeace.Constants;
+using static Syspeace.Constants;
 
 namespace Syspeace
 {
@@ -16,7 +16,7 @@ namespace Syspeace
 
         public static void SearchForIDInLogRow(string Logrow)
         {
-            string ID = GetValueFromRegexMatch(Logrow, "SessionID");
+            string ID = GetValueFromRegexMatch(Logrow, SessionID);
             MakeLogsToObservationObject(ID);
         }
         public static void MakeLogsToObservationObject(string ID)
@@ -28,10 +28,10 @@ namespace Syspeace
             int AuthCount = 0;
             bool CorrectPreviousTime = false;
 
-            foreach (var item in TextFile)
+            foreach (var LogRow in TextFile)
             {
                 bool ValidRow = false;
-                var Columns = item.Split("\t");
+                var Columns = LogRow.Split("\t");
 
                 if (Columns.Length == 4)
                 {
@@ -42,41 +42,41 @@ namespace Syspeace
                 {
                     if (CorrectPreviousTime == false)
                     {
-                        PreviousLineTime = DateTime.Parse(Columns[0]);
+                        PreviousLineTime = DateTime.Parse(Columns[TimeSpanColumn]);
                         NextLineTime = PreviousLineTime.AddHours(24);
                     }
                     else if (CorrectPreviousTime == true)
                     {
-                        NextLineTime = DateTime.Parse(Columns[0]);
+                        NextLineTime = DateTime.Parse(Columns[TimeSpanColumn]);
                     }
 
                     if (PreviousLineTime <= NextLineTime)
                     {
-                        if (item.Contains("\t" + ID + "\t") && item.Contains("\tCONNECT\t"))
+                        if (LogRow.Contains("\t" + ID + "\t") && LogRow.Contains(Connect))
                         {
                             _observation.SessionID = int.Parse(ID);
-                            IPAddress = GetValueFromRegexMatch(item, "CONNECT");
+                            IPAddress = GetValueFromRegexMatch(LogRow, Connect);
                             _observation.IPAddress = IPAddress;
                         }
-                        else if (item.Contains("\t" + ID + "\t") && item.Contains("\tAUTH\t"))
+                        else if (LogRow.Contains("\t" + ID + "\t") && LogRow.Contains(Auth))
                         {
                             if (AuthCount > 0)
                             {
                                 _observation = new Observation();
                             }
-                            _observation.Username = GetValueFromRegexMatch(item, "AUTH");
+                            _observation.Username = GetValueFromRegexMatch(LogRow, Auth);
                         }
-                        else if (item.Contains("\t" + ID + "\t") && (item.Contains("\tSUCCESS\t") || item.Contains("\tFAIL\t")))
+                        else if (LogRow.Contains("\t" + ID + "\t") && (LogRow.Contains(Success) || LogRow.Contains(Fail)))
                         {
-                            _observation.TimeStamp = DateTime.Parse(GetValueFromRegexMatch(item, "Time"));
+                            _observation.TimeSpan = DateTime.Parse(GetValueFromRegexMatch(LogRow, Time));
 
-                            if (item.Contains("\tSUCCESS\t"))
+                            if (LogRow.Contains(Success))
                             {
-                                _observation.Outcome = GetValueFromRegexMatch(item, "SUCCESS");
+                                _observation.Outcome = GetValueFromRegexMatch(LogRow, Success);
                             }
                             else
                             {
-                                _observation.Outcome = GetValueFromRegexMatch(item, "FAIL");
+                                _observation.Outcome = GetValueFromRegexMatch(LogRow, Fail);
                             }
 
                             if (AuthCount > 0)
@@ -109,37 +109,37 @@ namespace Syspeace
         }
         public static string GetValueFromRegexMatch(string LogLine, string Outcome)
         {
-            int Index = LogLine.IndexOf("\t" + Outcome);
+            int Index = LogLine.IndexOf(Outcome);
             int StartAt = Index + Outcome.Length;
-            int Lenght = LogLine.Length - (StartAt + 2);
+            int Lenght = LogLine.Length - StartAt;
 
-            if (Outcome == "SessionID")
+            if (Outcome == SessionID)
             {
-                Index = LogLine.IndexOf("\tCONNECT");
+                Index = LogLine.IndexOf(Connect);
                 Lenght = Index - 9;
                 Regex _regex = new Regex(@"\d+");
                 Match match = _regex.Match(LogLine, 9, Lenght);
                 return match.Value;
             }
-            else if (Outcome == "Time")
+            else if (Outcome == Time)
             {
                 Regex _regex = new Regex(@"..:..:..\t");
                 Match match = _regex.Match(LogLine);
                 return match.Value;
             }
-            else if (Outcome == "CONNECT")
+            else if (Outcome == Connect)
             {
                 Regex _regex = new Regex(@".*");
-                Match match = _regex.Match(LogLine, StartAt + 2, Lenght);
+                Match match = _regex.Match(LogLine, StartAt, Lenght);
                 return match.Value;
             }
-            else if (Outcome == "AUTH")
+            else if (Outcome == Auth)
             {
                 Regex _regex = new Regex(".*");
-                Match match = _regex.Match(LogLine, StartAt + 2, Lenght);
+                Match match = _regex.Match(LogLine, StartAt, Lenght);
                 return match.Value;
             }
-            else if (Outcome == "SUCCESS" || Outcome == "FAIL")
+            else if (Outcome == Success || Outcome == Fail)
             {
                 Lenght = LogLine.Length - (Index + 3);
                 Regex _regex = new Regex(".*");
@@ -155,7 +155,7 @@ namespace Syspeace
                 observation.SessionID == 0 ||
                 observation.IPAddress == null ||
                 observation.Username == null ||
-                observation.TimeStamp == null ||
+                observation.TimeSpan == null ||
                 observation.Outcome == null
             )
             {
@@ -169,8 +169,8 @@ namespace Syspeace
         public static bool ValidInputCheck(string[] input)
         {
             if (
-                DateTime.TryParse(input[0], out DateTime datetime) &&
-                int.TryParse(input[1], out int ID) &&
+                DateTime.TryParse(input[TimeSpanColumn], out DateTime datetime) &&
+                int.TryParse(input[SessionIDColumn], out int ID) &&
                 ID >= 1
             )
             {
