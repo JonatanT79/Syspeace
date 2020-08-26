@@ -6,6 +6,7 @@ namespace Syspeace
 {
     class Constants
     {
+        public const string FilePath = @"C:\Users\jonat\source\repos\Syspeace\Syspeace\Data\LoginFile.txt";
         public const string Time = "TIME";
         public const string SessionID = "SESSIONID";
         public const string Connect = "\tCONNECT\t";

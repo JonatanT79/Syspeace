@@ -8,25 +8,23 @@ using static Syspeace.Constants;
 
 namespace Syspeace
 {
-    static class ObservationObject
+    class ObservationObject
     {
-        public const string FilePath = @"C:\Users\jonat\source\repos\Syspeace\Syspeace\Data\LoginFile.txt";
-        public static string[] TextFile = File.ReadAllLines(FilePath);
         public static List<Observation> ObservationList = new List<Observation>();
-
-        public static void SearchForIDInLogRow(string Logrow)
+        public static void SearchForIDInLogRow(string Logrow, string[] TextFile)
         {
             string ID = GetValueFromRegexMatch(Logrow, SessionID);
-            MakeLogsToObservationObject(ID);
+            MakeLogsToObservationObject(ID, TextFile);
         }
-        public static void MakeLogsToObservationObject(string ID)
+        public static void MakeLogsToObservationObject(string ID, string[] TextFile)
         {
             Observation _observation = new Observation();
             string IPAddress = "";
-            DateTime PreviousLineTime = new DateTime();
-            DateTime NextLineTime = new DateTime();
+            string IDWithTabs = "\t" + ID + "\t";
             int AuthCount = 0;
             bool CorrectPreviousTime = false;
+            DateTime PreviousLineTime = new DateTime();
+            DateTime NextLineTime = new DateTime();
 
             foreach (var LogRow in TextFile)
             {
@@ -52,13 +50,13 @@ namespace Syspeace
 
                     if (PreviousLineTime <= NextLineTime)
                     {
-                        if (LogRow.Contains("\t" + ID + "\t") && LogRow.Contains(Connect))
+                        if (LogRow.Contains(IDWithTabs) && LogRow.Contains(Connect))
                         {
                             _observation.SessionID = int.Parse(ID);
                             IPAddress = GetValueFromRegexMatch(LogRow, Connect);
                             _observation.IPAddress = IPAddress;
                         }
-                        else if (LogRow.Contains("\t" + ID + "\t") && LogRow.Contains(Auth))
+                        else if (LogRow.Contains(IDWithTabs) && LogRow.Contains(Auth))
                         {
                             if (AuthCount > 0)
                             {
@@ -66,7 +64,7 @@ namespace Syspeace
                             }
                             _observation.Username = GetValueFromRegexMatch(LogRow, Auth);
                         }
-                        else if (LogRow.Contains("\t" + ID + "\t") && (LogRow.Contains(Success) || LogRow.Contains(Fail)))
+                        else if (LogRow.Contains(IDWithTabs) && (LogRow.Contains(Success) || LogRow.Contains(Fail)))
                         {
                             _observation.TimeSpan = DateTime.Parse(GetValueFromRegexMatch(LogRow, Time));
 
@@ -116,9 +114,10 @@ namespace Syspeace
             if (Outcome == SessionID)
             {
                 Index = LogLine.IndexOf(Connect);
-                Lenght = Index - 9;
+                StartAt = 9;
+                Lenght = Index - StartAt;
                 Regex _regex = new Regex(@"\d+");
-                Match match = _regex.Match(LogLine, 9, Lenght);
+                Match match = _regex.Match(LogLine, StartAt, Lenght);
                 return match.Value;
             }
             else if (Outcome == Time)

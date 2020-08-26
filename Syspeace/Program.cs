@@ -11,7 +11,7 @@ namespace Syspeace
     {
         static void Main(string[] args)
         {
-            var ObservationList = ReadTextFile(ObservationObject.FilePath);
+            var ObservationList = ReadTextFile(FilePath);
 
             foreach (var observation in ObservationList)
             {
@@ -23,11 +23,12 @@ namespace Syspeace
         }
         static List<Observation> ReadTextFile(string FilePath)
         {
+            string[] TextFile = File.ReadAllLines(FilePath);
             string SessionID = "";
 
-            for (int i = 0; i < ObservationObject.TextFile.Length; i++)
+            for (int i = 0; i < TextFile.Length; i++)
             {
-                string LogRow = ObservationObject.TextFile[i];
+                string LogRow = TextFile[i];
                 var ColumnArray = LogRow.Split("\t");
                 bool ValidRow = false;
 
@@ -40,7 +41,7 @@ namespace Syspeace
                 {
                     if (ColumnArray[SessionIDColumn] != SessionID)
                     {
-                        ObservationObject.SearchForIDInLogRow(LogRow);
+                        ObservationObject.SearchForIDInLogRow(LogRow, TextFile);
                         SessionID = ColumnArray[SessionIDColumn];
                     }
                 }
@@ -53,7 +54,7 @@ namespace Syspeace
 
 //Format:
 // Tid - ID - Status - Användarnamn - IP Adress
-//försök att använda path parametern
 //Skriv kod för att få med datumet från 'written at date' och lägga in det i 'data' propertyn
 //Försök att ersätta 3 i regex.match -> lägga in det i en variabel
+//Hitta ett sätt att få bort den globala listan(om möjligt)
 //Fixa connect buggen när koden körs mot magnus fil
