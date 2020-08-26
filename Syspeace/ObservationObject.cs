@@ -11,12 +11,12 @@ namespace Syspeace
     class ObservationObject
     {
         public static List<Observation> ObservationList = new List<Observation>();
-        public static void SearchForIDInLogRow(string Logrow, string[] TextFile)
+        public static void SearchForIDInLogRow(string Logrow, DateTime LogDate, string[] TextFile)
         {
             string ID = GetValueFromRegexMatch(Logrow, SessionID);
-            MakeLogsToObservationObject(ID, TextFile);
+            SearchForSpecificIdInTextFile(ID, LogDate, TextFile);
         }
-        public static void MakeLogsToObservationObject(string ID, string[] TextFile)
+        public static void SearchForSpecificIdInTextFile(string ID, DateTime LogDate, string[] TextFile)
         {
             Observation _observation = new Observation();
             string IPAddress = "";
@@ -31,10 +31,7 @@ namespace Syspeace
                 bool ValidRow = false;
                 var Columns = LogRow.Split("\t");
 
-                if (Columns.Length == 4)
-                {
-                    ValidRow = ValidInputCheck(Columns);
-                }
+                ValidRow = ValidInputCheck(Columns);
 
                 if (ValidRow)
                 {
@@ -67,6 +64,7 @@ namespace Syspeace
                         else if (LogRow.Contains(IDWithTabs) && (LogRow.Contains(Success) || LogRow.Contains(Fail)))
                         {
                             _observation.TimeSpan = DateTime.Parse(GetValueFromRegexMatch(LogRow, Time));
+                            _observation.Date = LogDate;
 
                             if (LogRow.Contains(Success))
                             {
@@ -120,6 +118,12 @@ namespace Syspeace
                 Match match = _regex.Match(LogLine, StartAt, Lenght);
                 return match.Value;
             }
+            else if (Outcome == Date)
+            {
+                Regex _regex = new Regex(@"\b....-..-..\b");
+                Match match = _regex.Match(LogLine);
+                return match.Value;
+            }
             else if (Outcome == Time)
             {
                 Regex _regex = new Regex(@"..:..:..\t");
@@ -154,7 +158,8 @@ namespace Syspeace
                 observation.SessionID == 0 ||
                 observation.IPAddress == null ||
                 observation.Username == null ||
-                observation.TimeSpan == null ||
+                observation.Date == new DateTime() ||
+                observation.TimeSpan == new DateTime() ||
                 observation.Outcome == null
             )
             {
@@ -167,18 +172,30 @@ namespace Syspeace
         }
         public static bool ValidInputCheck(string[] input)
         {
-            if (
-                DateTime.TryParse(input[TimeSpanColumn], out DateTime datetime) &&
-                int.TryParse(input[SessionIDColumn], out int ID) &&
-                ID >= 1
-            )
+            if (input.Length == 4)
             {
-                return true;
+                if (
+                    DateTime.TryParse(input[TimeSpanColumn], out DateTime datetime) &&
+                    int.TryParse(input[SessionIDColumn], out int ID) &&
+                    ID >= 1
+                )
+                {
+                    return true;
+                }
             }
-            else
+
+            return false;
+        }
+        public static void PrintOutObservationList(List<Observation> ObservationList)
+        {
+            foreach (var observation in ObservationList)
             {
-                return false;
+                Console.WriteLine(observation.Date.ToString("yyyy-MM-dd") + " " + observation.TimeSpan.ToString("HH:mm:ss") + " " +
+                observation.SessionID + " " + observation.Outcome + " " + observation.Username + " " + observation.IPAddress);
             }
+
+            Console.WriteLine("");
+            Console.WriteLine("Observation Count: " + ObservationList.Count);
         }
     }
 }

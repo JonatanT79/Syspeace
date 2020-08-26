@@ -12,18 +12,12 @@ namespace Syspeace
         static void Main(string[] args)
         {
             var ObservationList = ReadTextFile(FilePath);
-
-            foreach (var observation in ObservationList)
-            {
-                Console.WriteLine(observation.TimeSpan + " " + observation.SessionID + " " + observation.Outcome + " " + observation.Username + " " + observation.IPAddress);
-            }
-
-            Console.WriteLine("");
-            Console.WriteLine("Observation Count: " + ObservationList.Count);
+            ObservationObject.PrintOutObservationList(ObservationList);
         }
         static List<Observation> ReadTextFile(string FilePath)
         {
             string[] TextFile = File.ReadAllLines(FilePath);
+            DateTime LogDate = new DateTime();
             string SessionID = "";
 
             for (int i = 0; i < TextFile.Length; i++)
@@ -32,16 +26,19 @@ namespace Syspeace
                 var ColumnArray = LogRow.Split("\t");
                 bool ValidRow = false;
 
-                if (ColumnArray.Length == 4)
+                ValidRow = ObservationObject.ValidInputCheck(ColumnArray);
+
+                if (ColumnArray.Length == 1 && LogDate == new DateTime())
                 {
-                    ValidRow = ObservationObject.ValidInputCheck(ColumnArray);
+                    string StringDate = ObservationObject.GetValueFromRegexMatch(LogRow, Date);
+                    if (DateTime.TryParse(StringDate, out LogDate)) { }
                 }
 
                 if (LogRow.Contains(Connect) && ValidRow)
                 {
                     if (ColumnArray[SessionIDColumn] != SessionID)
                     {
-                        ObservationObject.SearchForIDInLogRow(LogRow, TextFile);
+                        ObservationObject.SearchForIDInLogRow(LogRow, LogDate, TextFile);
                         SessionID = ColumnArray[SessionIDColumn];
                     }
                 }
@@ -54,7 +51,7 @@ namespace Syspeace
 
 //Format:
 // Tid - ID - Status - Användarnamn - IP Adress
-//Skriv kod för att få med datumet från 'written at date' och lägga in det i 'data' propertyn
+//Överför funktioner till metoder
 //Försök att ersätta 3 i regex.match -> lägga in det i en variabel
 //Hitta ett sätt att få bort den globala listan(om möjligt)
 //Fixa connect buggen när koden körs mot magnus fil
